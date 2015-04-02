@@ -1,22 +1,20 @@
 package net.buycraft.tasks;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map.Entry;
+import java.util.*;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-import net.buycraft.Plugin;
+import net.buycraft.Buycraft;
 import net.buycraft.api.ApiTask;
 import net.buycraft.util.Chat;
 import net.buycraft.util.PackageCommand;
+import tk.coolv1994.gawdserver.launcher.Launch;
+import tk.coolv1994.gawdserver.player.PlayerList;
+import tk.coolv1994.gawdserver.utils.ColorCodes;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitTask;
+import static tk.coolv1994.gawdserver.utils.Chat.sendMessage;
 
 public class CommandExecuteTask extends ApiTask {
     private static final Pattern REPLACE_NAME = Pattern.compile("[{\\(<\\[](name|player|username)[}\\)>\\]]", Pattern.CASE_INSENSITIVE);
@@ -28,9 +26,9 @@ public class CommandExecuteTask extends ApiTask {
      */
     private final PriorityBlockingQueue<PackageCommand> commandQueue;
     private final AtomicBoolean isScheduled;
-    private BukkitTask task;
+    private TimerTask task;
 
-    private final HashMap<String, Integer> requiredInventorySlots = new HashMap<String, Integer>();
+    //private final HashMap<String, Integer> requiredInventorySlots = new HashMap<String, Integer>();
     private final HashSet<String> creditedCommands = new HashSet<String>();
 
     private String lastLongRunningCommand = "None";
@@ -53,16 +51,15 @@ public class CommandExecuteTask extends ApiTask {
         // Convert delay from seconds to ticks
         delay *= 20;
         try {
-            username = Bukkit.getServer().getOfflinePlayer(username).getName();
             command = REPLACE_NAME.matcher(command).replaceAll(username);
 
             if (command.startsWith("{mcmyadmin}")) {
-                Plugin.getInstance().getLogger().info("Executing command '" + command + "' on behalf of user '" + username + "'.");
+                Buycraft.getInstance().getLogger().info("Executing command '" + command + "' on behalf of user '" + username + "'.");
                 String newCommand = command.replace("{mcmyadmin}", "");                
                 Logger.getLogger("McMyAdmin").info("Buycraft tried command: " + newCommand);
             } else {
                 PackageCommand pkgCmd = new PackageCommand(commandId, username, command, delay, requiredInventorySlots);
-                if (!Plugin.getInstance().getCommandDeleteTask().queuedForDeletion(commandId) && !commandQueue.contains(pkgCmd)) {
+                if (!Buycraft.getInstance().getCommandDeleteTask().queuedForDeletion(commandId) && !commandQueue.contains(pkgCmd)) {
                     commandQueue.add(pkgCmd);
                 }
             }
@@ -100,12 +97,12 @@ public class CommandExecuteTask extends ApiTask {
                 PackageCommand pkgcmd = commandQueue.poll();
 
                 // Ignore the command if the player does not have enough free item slots
-                if (pkgcmd.requiresFreeInventorySlots()) {
-                    Player player = Bukkit.getPlayer(pkgcmd.username);
+                /*if (pkgcmd.requiresFreeInventorySlots()) {
+                    String player = getPlayer(PlayerList.getUsernames(), pkgcmd.username);
                     int result = pkgcmd.calculateRequiredInventorySlots(player);
                     if (result > 0) {
                         // Fetch any current amounts
-                        Integer currentRequired = requiredInventorySlots.get(player.getName());
+                        Integer currentRequired = requiredInventorySlots.get(player);
                         // Check an amount exists
                         if (currentRequired == null) {
                             currentRequired = 0;
@@ -113,19 +110,20 @@ public class CommandExecuteTask extends ApiTask {
 
                         // Update the hash map with the higher result
                         if (currentRequired < result) {
-                            requiredInventorySlots.put(player.getName(), result);
+                            requiredInventorySlots.put(player, result);
                         }
                         
                         continue;
                     }
                
-                }
+                }*/
 
-                Plugin.getInstance().getLogger().info("Executing command '" + pkgcmd.command + "' on behalf of user '" + pkgcmd.username + "'.");
+                Buycraft.getInstance().getLogger().info("Executing command '" + pkgcmd.command + "' on behalf of user '" + pkgcmd.username + "'.");
                 creditedCommands.add(pkgcmd.username);
                 long cmdStart = System.currentTimeMillis();
 
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), pkgcmd.command);
+                System.out.println("[Buycraft] Executing command: " + pkgcmd.command);
+                Launch.sendCommand(pkgcmd.command);
                 // Check if the command lasted longer than our threshold
                 long cmdDiff = System.currentTimeMillis() - cmdStart;
                 if (cmdDiff >= 10) {
@@ -134,7 +132,7 @@ public class CommandExecuteTask extends ApiTask {
                 }
 
                 // Queue the command for deletion
-                Plugin.getInstance().getCommandDeleteTask().deleteCommand(pkgcmd.getId());
+                Buycraft.getInstance().getCommandDeleteTask().deleteCommand(pkgcmd.getId());
             } catch (Throwable e) {
                 e.printStackTrace();
             }
@@ -142,40 +140,40 @@ public class CommandExecuteTask extends ApiTask {
 
         if (commandQueue.isEmpty()) {
             // Tell users that they need more inventory space
-            for (Entry<String, Integer> e : requiredInventorySlots.entrySet()) {
-                Player p = Bukkit.getPlayerExact(e.getKey());
+            /*for (Entry<String, Integer> e : requiredInventorySlots.entrySet()) {
+                String p = getPlayer(PlayerList.getOnlinePlayers(), e.getKey());
                 if (p == null) {
                     continue;
                 }
-                p.sendMessage(new String[] {
-                        Chat.header(), 
-                        Chat.seperator(),
-                        Chat.seperator() + ChatColor.RED + String.format(Plugin.getInstance().getLanguage().getString("commandExecuteNotEnoughFreeInventory"), e.getValue()),
-                        Chat.seperator() + ChatColor.RED + Plugin.getInstance().getLanguage().getString("commandExecuteNotEnoughFreeInventory2"),
-                        Chat.seperator(), 
-                        Chat.footer()
-                });
+                Chat.sendMessage(p,
+                        Chat.header() + "\n" +
+                                Chat.seperator() + "\n" +
+                                Chat.seperator() + Chat.RED + String.format(Plugin.getInstance().getLanguage().getString("commandExecuteNotEnoughFreeInventory"), e.getValue()) + "\n" +
+                                Chat.seperator() + Chat.RED + Plugin.getInstance().getLanguage().getString("commandExecuteNotEnoughFreeInventory2") + "\n" +
+                                Chat.seperator() + "\n" +
+                                Chat.footer()
+                );
             }
             // Clear the map
-            requiredInventorySlots.clear();
+            requiredInventorySlots.clear();*/
             
             for (String name : creditedCommands) {
-                Player p = Bukkit.getPlayerExact(name);
+                String p = getPlayer(PlayerList.getOnlinePlayers(), name);
                 if (p == null) {
                     continue;
                 }
-                p.sendMessage(new String[] {
-                        Chat.header(), 
-                        Chat.seperator(),
-                        Chat.seperator() + ChatColor.GREEN + Plugin.getInstance().getLanguage().getString("commandsExecuted"),
-                        Chat.seperator(), 
-                        Chat.footer()
-                });
+                sendMessage(p,
+                        Chat.header() + "\n" +
+                                Chat.seperator() + "\n" +
+                                Chat.seperator() + ColorCodes.GREEN + Buycraft.getInstance().getLanguage().getString("commandsExecuted") + "\n" +
+                                Chat.seperator() + "\n" +
+                                Chat.footer()
+                );
             }
             // Clear the set
             creditedCommands.clear();
 
-            BukkitTask task = this.task;
+            TimerTask task = this.task;
             // Null the task now so we can't overwrite a new one
             this.task = null;
             // Allow a new task to be scheduled
@@ -183,5 +181,13 @@ public class CommandExecuteTask extends ApiTask {
             // Cancel the current task
             task.cancel();
         }
+    }
+
+    private String getPlayer(Collection<String> players, String name) {
+        for (String player : players) {
+            if (player.equalsIgnoreCase(name))
+                return player;
+        }
+        return null;
     }
 }

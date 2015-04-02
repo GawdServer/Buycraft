@@ -41,16 +41,8 @@ public class Settings {
         Boolean toSave = false;
 
         defaultProperties.put("secret", "");
-        defaultProperties.put("autoUpdate", "true");
         defaultProperties.put("commandChecker", "true");
         defaultProperties.put("https", "false");
-        defaultProperties.put("disableBuyCommand", "false");
-        defaultProperties.put("useBuyGUI", "true");
-        defaultProperties.put("directPay", "false");
-        defaultProperties.put("buyCommand", "buy");
-        defaultProperties.put("headsEnabled", "false");
-        defaultProperties.put("headsCurrency", "true");
-        defaultProperties.put("buysignsRemoveFreePrice", "false");
         defaultProperties.put("debug", "false");
         defaultProperties.put("commandThrottleCount", "150");
         defaultProperties.put("disable-secret-command", "false");

@@ -1,25 +1,25 @@
 package net.buycraft.tasks;
 
-import net.buycraft.Plugin;
+import net.buycraft.Buycraft;
 import net.buycraft.api.ApiTask;
 import net.buycraft.util.Chat;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import tk.coolv1994.gawdserver.utils.ColorCodes;
 
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import static tk.coolv1994.gawdserver.utils.Chat.sendMessage;
 
 public class RecentPaymentsTask extends ApiTask {
     
-    private CommandSender receiver;
+    private String receiver;
     private String playerLookup;
     
-    public static void call(CommandSender receiver, String player) {
-        Plugin.getInstance().addTask(new RecentPaymentsTask(receiver, player));
+    public static void call(String receiver, String player) {
+        Buycraft.getInstance().addTask(new RecentPaymentsTask(receiver, player));
     }
 
-    private RecentPaymentsTask(CommandSender receiver, String playerLookup) {
+    private RecentPaymentsTask(String receiver, String playerLookup) {
         this.receiver = receiver;
         this.playerLookup = playerLookup;
     }
@@ -27,47 +27,47 @@ public class RecentPaymentsTask extends ApiTask {
     public void run() {
         try {
             
-            JSONObject apiResponse = getApi().paymentsAction(10, playerLookup.length() > 0, playerLookup);
+            JsonObject apiResponse = getApi().paymentsAction(10, playerLookup.length() > 0, playerLookup);
             
             if (apiResponse != null) {
                 
-                JSONArray entries = apiResponse.getJSONArray("payload");
+                JsonArray entries = apiResponse.get("payload").getAsJsonArray();
                 
-                if(entries != null && entries.length() > 0) {
-                    receiver.sendMessage(Chat.header());
-                    receiver.sendMessage(Chat.seperator());
+                if(entries != null && entries.size() > 0) {
+                    sendMessage(receiver, Chat.header());
+                    sendMessage(receiver, Chat.seperator());
                     
                     if(playerLookup.isEmpty())
                     {
-                        receiver.sendMessage(Chat.seperator() + "Displaying recent payments over all users: ");
+                        sendMessage(receiver, Chat.seperator() + "Displaying recent payments over all users: ");
                     }
                     else
                     {
-                        receiver.sendMessage(Chat.seperator() + "Displaying recent payments from the user " + playerLookup + ":");
+                        sendMessage(receiver, Chat.seperator() + "Displaying recent payments from the user " + playerLookup + ":");
                     }
 
-                    receiver.sendMessage(Chat.seperator());
+                    sendMessage(receiver, Chat.seperator());
                     
-                    for(int i=0; i<entries.length(); i++) {
-                        
-                        JSONObject entry = entries.getJSONObject(i);
-                        
-                        receiver.sendMessage(Chat.seperator() + "[" + entry.getString("humanTime") + "] " + ChatColor.LIGHT_PURPLE + entry.getString("ign") + ChatColor.GREEN + " (" + entry.getString("price") + " " + entry.getString("currency") + ")");
+                    for(int i=0; i<entries.size(); i++) {
+
+                        JsonObject entry = entries.get(i).getAsJsonObject();
+
+                        sendMessage(receiver, Chat.seperator() + "[" + entry.get("humanTime").getAsString() + "] " + ColorCodes.LIGHT_PURPLE + entry.get("ign").getAsString() + ColorCodes.GREEN + " (" + entry.get("price").getAsString() + " " + entry.get("currency").getAsString() + ")");
                     }
-                    
-                    receiver.sendMessage(Chat.seperator());
-                    receiver.sendMessage(Chat.footer());
+
+                    sendMessage(receiver, Chat.seperator());
+                    sendMessage(receiver, Chat.footer());
                 }
                 else
                 {
-                    receiver.sendMessage(Chat.header());
-                    receiver.sendMessage(Chat.seperator());
-                    receiver.sendMessage(Chat.seperator() + ChatColor.RED + "No recent payments to display.");
-                    receiver.sendMessage(Chat.seperator());
-                    receiver.sendMessage(Chat.footer());
+                    sendMessage(receiver, Chat.header());
+                    sendMessage(receiver, Chat.seperator());
+                    sendMessage(receiver, Chat.seperator() + ColorCodes.RED + "No recent payments to display.");
+                    sendMessage(receiver, Chat.seperator());
+                    sendMessage(receiver, Chat.footer());
                 }
             } 
-        } catch (JSONException e) {
+        } catch (JsonParseException e) {
             getLogger().severe("JSON parsing error.");
             ReportTask.setLastException(e);
         }

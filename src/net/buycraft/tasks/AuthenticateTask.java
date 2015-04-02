@@ -1,60 +1,49 @@
 package net.buycraft.tasks;
 
-import net.buycraft.Plugin;
+import net.buycraft.Buycraft;
 import net.buycraft.api.ApiTask;
-
-import org.json.JSONObject;
+import com.google.gson.JsonObject;
 
 public class AuthenticateTask extends ApiTask {
-    private Plugin plugin;
+    private Buycraft plugin;
 
     public static void call() {
-        Plugin.getInstance().addTask(new AuthenticateTask());
+        Buycraft.getInstance().addTask(new AuthenticateTask());
     }
 
     private AuthenticateTask() {
-        this.plugin = Plugin.getInstance();
+        this.plugin = Buycraft.getInstance();
     }
 
     public void run() {
         try {
-            final JSONObject apiResponse = plugin.getApi().authenticateAction();
+            final JsonObject apiResponse = plugin.getApi().authenticateAction();
             plugin.setAuthenticated(false);
             // call sync
             if (apiResponse != null) {
-                Runnable r = new Runnable() {
-                    public void run() {
-                        try {
-                            plugin.setAuthenticatedCode(apiResponse.getInt("code"));
+                try {
+                    plugin.setAuthenticatedCode(apiResponse.get("code").getAsInt());
 
-                            if (apiResponse.getInt("code") == 0) {
-                                JSONObject payload = apiResponse.getJSONObject("payload");
+                    if (apiResponse.get("code").getAsInt() == 0) {
+                        JsonObject payload = apiResponse.getAsJsonObject("payload");
 
-                                plugin.setServerID(payload.getInt("serverId"));
-                                plugin.setServerCurrency(payload.getString("serverCurrency"));
-                                plugin.setServerStore(payload.getString("serverStore"));
-                                plugin.setPendingPlayerCheckerInterval(payload.getInt("updateUsernameInterval"));
-                                plugin.setAuthenticated(true);
+                        plugin.setServerID(payload.get("serverId").getAsInt());
+                        plugin.setServerCurrency(payload.get("serverCurrency").getAsString());
+                        plugin.setServerStore(payload.get("serverStore").getAsString());
+                        plugin.setPendingPlayerCheckerInterval(payload.get("updateUsernameInterval").getAsInt());
+                        plugin.setAuthenticated(true);
 
-                                if (payload.has("buyCommand")) {
-                                    plugin.setBuyCommand(payload.getString("buyCommand"));
-                                }
+                        plugin.getLogger().info("Authenticated with the specified Secret key.");
+                        plugin.getLogger().info("Plugin is now ready to be used.");
 
-                                plugin.getLogger().info("Authenticated with the specified Secret key.");
-                                plugin.getLogger().info("Plugin is now ready to be used.");
-
-                                ReloadPackagesTask.call();
-                            } else if (apiResponse.getInt("code") == 101) {
-                                plugin.getLogger().severe("The specified Secret key could not be found.");
-                                plugin.getLogger().severe("Type /buycraft for further advice & help.");
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            ReportTask.setLastException(e);
-                        }
+                    } else if (apiResponse.get("code").getAsInt() == 101) {
+                        plugin.getLogger().severe("The specified Secret key could not be found.");
+                        plugin.getLogger().severe("Type !buycraft for further advice & help.");
                     }
-                };
-                sync(r);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    ReportTask.setLastException(e);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

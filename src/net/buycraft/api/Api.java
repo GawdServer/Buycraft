@@ -1,12 +1,11 @@
 package net.buycraft.api;
 
-import net.buycraft.Plugin;
+import net.buycraft.Buycraft;
 import net.buycraft.tasks.ReportTask;
-
-import org.bukkit.Bukkit;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import tk.coolv1994.gawdserver.player.PlayerList;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -17,13 +16,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Api {
-    private Plugin plugin;
+    private Buycraft plugin;
 
     private String apiUrl;
     private String apiKey;
 
     public Api() {
-        this.plugin = Plugin.getInstance();
+        this.plugin = Buycraft.getInstance();
         this.apiKey = plugin.getSettings().getString("secret");
 
         if (plugin.getSettings().getBoolean("https")) {
@@ -33,20 +32,20 @@ public class Api {
         }
     }
 
-    public JSONObject authenticateAction() {
+    public JsonObject authenticateAction() {
         HashMap<String, String> apiCallParams = new HashMap<String, String>();
 
         apiCallParams.put("action", "info");
         
-        apiCallParams.put("serverPort", String.valueOf(Bukkit.getPort()));
-        apiCallParams.put("onlineMode", String.valueOf(Bukkit.getOnlineMode()));
-        apiCallParams.put("playersMax", String.valueOf(Bukkit.getMaxPlayers()));
+        apiCallParams.put("serverPort", String.valueOf(25565)); //plugin.getServer().getServerPort()
+        apiCallParams.put("onlineMode", String.valueOf(true)); //plugin.getServer().getOnlineMode()
+        apiCallParams.put("playersMax", String.valueOf(9000)); // No current API support
         apiCallParams.put("version", plugin.getVersion());
 
         return call(apiCallParams);
     }
 
-    public JSONObject categoriesAction() {
+    public JsonObject categoriesAction() {
         HashMap<String, String> apiCallParams = new HashMap<String, String>();
 
         apiCallParams.put("action", "categories");
@@ -54,7 +53,7 @@ public class Api {
         return call(apiCallParams);
     }
     
-    public JSONObject urlAction(String url) {
+    public JsonObject urlAction(String url) {
         HashMap<String, String> apiCallParams = new HashMap<String, String>();
 
         apiCallParams.put("action", "url");
@@ -63,7 +62,7 @@ public class Api {
         return call(apiCallParams);
     }
 
-    public JSONObject packagesAction() {
+    public JsonObject packagesAction() {
         HashMap<String, String> apiCallParams = new HashMap<String, String>();
 
         apiCallParams.put("action", "packages");
@@ -71,7 +70,7 @@ public class Api {
         return call(apiCallParams);
     }
 
-    public JSONObject paymentsAction(int limit, boolean usernameSpecific, String username) {
+    public JsonObject paymentsAction(int limit, boolean usernameSpecific, String username) {
         HashMap<String, String> apiCallParams = new HashMap<String, String>();
 
         apiCallParams.put("action", "payments");
@@ -84,7 +83,7 @@ public class Api {
         return call(apiCallParams);
     }
 
-    public JSONObject fetchPendingPlayers() {
+    public JsonObject fetchPendingPlayers() {
         HashMap<String, String> apiCallParams = new HashMap<String, String>();
 
         apiCallParams.put("action", "pendingUsers");
@@ -92,7 +91,7 @@ public class Api {
         return call(apiCallParams);
     }
 
-    public JSONObject fetchPlayerCommands(JSONArray players, boolean offlineCommands) {
+    public JsonObject fetchPlayerCommands(JsonArray players, boolean offlineCommands) {
         HashMap<String, String> apiCallParams = new HashMap<String, String>();
 
         apiCallParams.put("action", "commands");
@@ -116,13 +115,13 @@ public class Api {
         call(apiCallParams);
     }
 
-    private JSONObject call(HashMap<String, String> apiCallParams) {
+    private JsonObject call(HashMap<String, String> apiCallParams) {
         if (apiKey.length() == 0) {
             apiKey = "unspecified";
         }
 
         apiCallParams.put("secret", apiKey);
-        apiCallParams.put("playersOnline", String.valueOf(Bukkit.getOnlinePlayers().length));
+        apiCallParams.put("playersOnline", String.valueOf(PlayerList.onlinePlayers()));
   
         String url = apiUrl + generateUrlQueryString(apiCallParams);
 
@@ -131,11 +130,11 @@ public class Api {
 
             try {
                 if (HTTPResponse != null) {
-                    return new JSONObject(HTTPResponse);
+                    return (JsonObject) plugin.getJsonParser().parse(HTTPResponse);
                 } else {
                     return null;
                 }
-            } catch (JSONException e) {
+            } catch (JsonParseException e) {
                 plugin.getLogger().severe("JSON parsing error.");
                 ReportTask.setLastException(e);
             }
@@ -147,9 +146,9 @@ public class Api {
     public static String HttpRequest(String url) {
         try {
         	
-        	if(Plugin.getInstance().getSettings().getBoolean("debug")) {
-        		Plugin.getInstance().getLogger().info("---------------------------------------------------");
-        		Plugin.getInstance().getLogger().info("Request URL: " + url);
+        	if(Buycraft.getInstance().getSettings().getBoolean("debug")) {
+        		Buycraft.getInstance().getLogger().info("---------------------------------------------------");
+        		Buycraft.getInstance().getLogger().info("Request URL: " + url);
         	}
         	
             String content = "";
@@ -176,27 +175,27 @@ public class Api {
 
             in.close();
             
-            if(Plugin.getInstance().getSettings().getBoolean("debug")) {
-            	Plugin.getInstance().getLogger().info("JSON Response: " + content);
-            	Plugin.getInstance().getLogger().info("---------------------------------------------------");
+            if(Buycraft.getInstance().getSettings().getBoolean("debug")) {
+            	Buycraft.getInstance().getLogger().info("JSON Response: " + content);
+            	Buycraft.getInstance().getLogger().info("---------------------------------------------------");
             }
             
             return content;
         } catch (ConnectException e) {
-            Plugin.getInstance().getLogger().severe("HTTP request failed due to connection error.");
+            Buycraft.getInstance().getLogger().severe("HTTP request failed due to connection error.");
             ReportTask.setLastException(e);
         } catch (SocketTimeoutException e) {
-            Plugin.getInstance().getLogger().severe("HTTP request failed due to timeout error.");
+            Buycraft.getInstance().getLogger().severe("HTTP request failed due to timeout error.");
             ReportTask.setLastException(e);
         } catch (FileNotFoundException e) {
-            Plugin.getInstance().getLogger().severe("HTTP request failed due to file not found.");
+            Buycraft.getInstance().getLogger().severe("HTTP request failed due to file not found.");
             ReportTask.setLastException(e);
         } catch (UnknownHostException e) {
-            Plugin.getInstance().getLogger().severe("HTTP request failed due to unknown host.");
+            Buycraft.getInstance().getLogger().severe("HTTP request failed due to unknown host.");
             ReportTask.setLastException(e);
         } catch (IOException e) {
-        	 Plugin.getInstance().getLogger().severe(e.getMessage());
-             ReportTask.setLastException(e);
+        	Buycraft.getInstance().getLogger().severe(e.getMessage());
+            ReportTask.setLastException(e);
         } catch (Exception e) {
             e.printStackTrace();
             ReportTask.setLastException(e);

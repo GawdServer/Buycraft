@@ -1,0 +1,11 @@
+{
+  "name": "Buycraft",
+  "version": "1.0",
+  "mainClass": "net.buycraft.Buycraft",
+  "commands": {
+    "buycraft": "net.buycraft.commands.BuycraftCommand"
+  },
+  "events": {
+    "playerAccess": "net.buycraft.JoinEvent"
+  }
+}

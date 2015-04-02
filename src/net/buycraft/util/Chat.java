@@ -1,11 +1,11 @@
 package net.buycraft.util;
 
-import org.bukkit.ChatColor;
+import tk.coolv1994.gawdserver.utils.ColorCodes;
 
 public class Chat {
-    private static final String header = ChatColor.WHITE + "|----------------------" + ChatColor.LIGHT_PURPLE + " BUYCRAFT " + ChatColor.WHITE + "---------------------";
-    private static final String footer = ChatColor.WHITE + "|----------------------------------------------------";
-    private static final String seperator = ChatColor.WHITE + "| ";
+    private static final String header = ColorCodes.WHITE + "|----------------------"+ColorCodes.LIGHT_PURPLE+" BUYCRAFT "+ColorCodes.WHITE+"---------------------";
+    private static final String footer = ColorCodes.WHITE + "|----------------------------------------------------";
+    private static final String seperator = ColorCodes.WHITE + "| ";
 
     private Chat() {}
 

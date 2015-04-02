@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URL;
 import java.net.UnknownHostException;
@@ -11,14 +12,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
 
-import net.buycraft.Plugin;
+import net.buycraft.Buycraft;
 import net.buycraft.api.ApiTask;
 import net.buycraft.util.Chat;
+import tk.coolv1994.gawdserver.utils.ColorCodes;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+import static tk.coolv1994.gawdserver.utils.Chat.sendMessage;
 
 public class ReportTask extends ApiTask {
 
@@ -30,50 +29,50 @@ public class ReportTask extends ApiTask {
     private static boolean running = false;
     private static Exception lastException = null;
 
-    private final CommandSender sender;
+    private final String sender;
 
     public static void setLastException(Exception e) {
         lastException = e;
     }
 
-    public static boolean call(CommandSender sender) {
+    public static boolean call(String sender) {
         if (running) {
-            if (sender instanceof Player) {
-                sender.sendMessage(Chat.header());
-                sender.sendMessage(Chat.seperator());
-                sender.sendMessage(Chat.seperator() + ChatColor.RED + "A report is already being generated. Please wait.");
-                sender.sendMessage(Chat.seperator());
-                sender.sendMessage(Chat.footer());
+            if (sender instanceof String) {
+                sendMessage(sender, Chat.header());
+                sendMessage(sender, Chat.seperator());
+                sendMessage(sender, Chat.seperator() + ColorCodes.RED + "A report is already being generated. Please wait.");
+                sendMessage(sender, Chat.seperator());
+                sendMessage(sender, Chat.footer());
             } else {
-                Plugin.getInstance().getLogger().warning("A report is already being generated. Please wait.");
+                Buycraft.getInstance().getLogger().warning("A report is already being generated. Please wait.");
             }
 
             return false;
         }
         
-        Plugin.getInstance().addTask(new ReportTask(sender));
+        Buycraft.getInstance().addTask(new ReportTask(sender));
         return running = true;
     }
     
-    private ReportTask(CommandSender sender) {
+    private ReportTask(String sender) {
         this.sender = sender;
     }
 
     public void run() {
         try {
-            Plugin.getInstance().getLogger().info("Starting generation of a report");
+            Buycraft.getInstance().getLogger().info("Starting generation of a report");
 
             String date = new Date().toString();;
 
             String os = System.getProperty("os.name") + " | " + System.getProperty("os.version") + " | " + System.getProperty("os.arch");
             String javaVersion = System.getProperty("java.version") + " | " + System.getProperty("java.vendor");
-            String serverVersion = Bukkit.getBukkitVersion();
-            String serverName = Bukkit.getServer().getName();
-            String serverIP = Bukkit.getIp();
-            int serverPort = Bukkit.getPort();
-            String buycraftVersion = Plugin.getInstance().getVersion();
+            String serverVersion = "1.0.0";
+            String serverName = "Minecraft Server";
+            String serverIP = InetAddress.getLocalHost().getHostAddress();
+            int serverPort = 25565; //getPlugin().getServer().getServerPort();
+            String buycraftVersion = Buycraft.getInstance().getVersion();
 
-            boolean isAuthenticated = Plugin.getInstance().isAuthenticated(null);
+            boolean isAuthenticated = Buycraft.getInstance().isAuthenticated(null);
             double lastPackageCheckerExecutionTime = (System.currentTimeMillis() - CommandFetchTask.getLastExecution()) / 1000.0 / 60.0;
             String lastPackageCheckerExecution = CommandFetchTask.getLastExecution() != 0 ? lastPackageCheckerExecutionTime + " minutes ago": "Never";
 
@@ -92,39 +91,39 @@ public class ReportTask extends ApiTask {
                     "Server Version: ", serverVersion, '\n',
                     "Server Name: ", serverName, "\n",
                     "Server IP: ", serverIP, ":", serverPort, "\n",
-                    "Buycraft Version: ", buycraftVersion, '\n',
+                    "RainbowBuycraft Version: ", buycraftVersion, '\n',
                     '\n',
-                    "#### Buycraft Info ####", '\n',
-                    "Store URL: " , Plugin.getInstance().getServerStore(), '\n',
-                    "Store ID: " , Plugin.getInstance().getServerID(), '\n',
-                    "Buy Command: ", Plugin.getInstance().getBuyCommand(), '\n',
+                    "#### buycraft Info ####", '\n',
+                    "Store URL: " , Buycraft.getInstance().getServerStore(), '\n',
+                    "Store ID: " , Buycraft.getInstance().getServerID(), '\n',
+                    "Buy Command: ", "N/A", '\n',
                     "Authenticated: ", isAuthenticated, '\n',
-                    "Error code: ", Plugin.getInstance().getAuthenticatedCode(), '\n',
+                    "Error code: ", Buycraft.getInstance().getAuthenticatedCode(), '\n',
                     "Last Package Checker Execution: ", lastPackageCheckerExecution, '\n',
                     '\n',
                     "#### Connection ####", '\n',
                     "Google Ping Result: ", pingGoogle, '\n',
-                    "Buycraft API Ping Result: ", pingApi, '\n',
+                    "buycraft API Ping Result: ", pingApi, '\n',
                     "URL Shortener Ping Result: ", isGdCheck, '\n',
-                    "Buycraft API Status Result: ", serviceCheck, '\n',
+                    "buycraft API Status Result: ", serviceCheck, '\n',
                     '\n',
                     "#### Performance ####", '\n',
-                    "Long Running Command: ", Plugin.getInstance().getCommandExecutor().getLastLongRunningCommand(), '\n',
+                    "Long Running Command: ", Buycraft.getInstance().getCommandExecutor().getLastLongRunningCommand(), '\n',
                     '\n',
                     "#### Last Exception ####", '\n',
                     lastException != null ? lastException : "No errors since startup"
                     ));
         } catch (Throwable e) {
-            if (sender instanceof Player) {
-                sender.sendMessage(Chat.header());
-                sender.sendMessage(Chat.seperator());
-                sender.sendMessage(Chat.seperator() + ChatColor.RED + "Error occured when generating the report");
-                sender.sendMessage(Chat.seperator() + ChatColor.RED + "See console for more information");
-                sender.sendMessage(Chat.seperator());
-                sender.sendMessage(Chat.footer());
+            if (sender instanceof String) {
+                sendMessage(sender, Chat.header());
+                sendMessage(sender, Chat.seperator());
+                sendMessage(sender, Chat.seperator() + ColorCodes.RED + "Error occured when generating the report");
+                sendMessage(sender, Chat.seperator() + ColorCodes.RED + "See console for more information");
+                sendMessage(sender, Chat.seperator());
+                sendMessage(sender, Chat.footer());
             }
 
-            Plugin.getInstance().getLogger().warning("Error occured when generating the report");
+            Buycraft.getInstance().getLogger().warning("Error occured when generating the report");
 
             e.printStackTrace();
         } finally {
@@ -169,7 +168,7 @@ public class ReportTask extends ApiTask {
      * @throws IOException 
      */
     private void writeReport(String ...data) throws IOException {
-        File report = new File(Plugin.getInstance().getDataFolder(), "report.txt");
+        File report = new File(Buycraft.getInstance().getFolderPath(), "report.txt");
 
             FileWriter fw = new FileWriter(report);
             BufferedWriter bw = new BufferedWriter(fw);
@@ -182,14 +181,14 @@ public class ReportTask extends ApiTask {
                 bw.close();
             }
 
-            if (sender instanceof Player) {
-                sender.sendMessage(Chat.header());
-                sender.sendMessage(Chat.seperator());
-                sender.sendMessage(Chat.seperator() + ChatColor.GREEN + "Report written to " + report.getPath());
-                sender.sendMessage(Chat.seperator());
-                sender.sendMessage(Chat.footer());
+            if (sender instanceof String) {
+                sendMessage(sender, Chat.header());
+                sendMessage(sender, Chat.seperator());
+                sendMessage(sender, Chat.seperator() + ColorCodes.GREEN + "Report written to " + report.getPath());
+                sendMessage(sender, Chat.seperator());
+                sendMessage(sender, Chat.footer());
             }
-            Plugin.getInstance().getLogger().info("Report written to " + report.getPath());
+            Buycraft.getInstance().getLogger().info("Report written to " + report.getPath());
     }
 
     private String pingCheck(String url) {

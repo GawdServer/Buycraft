@@ -2,18 +2,14 @@ package net.buycraft.tasks;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import net.buycraft.Plugin;
+import net.buycraft.Buycraft;
 import net.buycraft.api.ApiTask;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import tk.coolv1994.gawdserver.player.PlayerList;
 
 /**
  * Fetches an array of players which are waiting for commands to be run.
@@ -22,9 +18,9 @@ import net.buycraft.api.ApiTask;
  * If a player which is in the pending players set joins the server the command fetch task is called
  *
  */
-public class PendingPlayerCheckerTask extends ApiTask implements Listener {
+public class PendingPlayerCheckerTask extends ApiTask {
 
-    private final Plugin plugin;
+    private final Buycraft plugin;
     private final AtomicBoolean running = new AtomicBoolean(false);
     /** Stores players with pending commands in lower case */
     private HashSet<String> pendingPlayers = new HashSet<String>();
@@ -32,7 +28,7 @@ public class PendingPlayerCheckerTask extends ApiTask implements Listener {
     private long lastPlayerLogin;
 
     public PendingPlayerCheckerTask() {
-        plugin = Plugin.getInstance();
+        plugin = Buycraft.getInstance();
         lastPlayerLogin = System.currentTimeMillis();
     }
 
@@ -43,11 +39,10 @@ public class PendingPlayerCheckerTask extends ApiTask implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    public synchronized void onPlayerJoin(PlayerJoinEvent event) {
+    public synchronized void onPlayerJoin(String player) {
         // If the player has pending commands we call the package checker
-        if (pendingPlayers.remove(event.getPlayer().getName().toLowerCase())) {
-            CommandFetchTask.call(false, event.getPlayer());
+        if (pendingPlayers.remove(player.toLowerCase())) {
+            CommandFetchTask.call(false, player);
         }
         lastPlayerLogin = System.currentTimeMillis();
     }
@@ -65,40 +60,40 @@ public class PendingPlayerCheckerTask extends ApiTask implements Listener {
             }
 
             // Fetch online player list
-            Player[] onlinePlayers = plugin.getServer().getOnlinePlayers();
+            List<String> onlinePlayers = PlayerList.getOnlinePlayers();
 
             // If nobody has logged in for over 3 hours do not execute the package checker (Manual execution is an exception)
             if (!manualExecution && lastPlayerLogin < (System.currentTimeMillis() - 1080000)) {
                 return;
-            } else if (onlinePlayers.length > 0) {
+            } else if (onlinePlayers.size() > 0) {
                 lastPlayerLogin = System.currentTimeMillis();
             }
 
             // Fetch pending players
-            JSONObject apiResponse = plugin.getApi().fetchPendingPlayers();
+            JsonObject apiResponse = plugin.getApi().fetchPendingPlayers();
 
-            if (apiResponse == null || apiResponse.getInt("code") != 0) {
+            if (apiResponse == null || apiResponse.get("code").getAsInt() != 0) {
                 plugin.getLogger().severe("No response/invalid key during pending players check.");
                 return;
             }
 
-            JSONObject apiPayload = apiResponse.getJSONObject("payload");
+            JsonObject apiPayload = apiResponse.getAsJsonObject("payload");
 
-            JSONArray pendingPlayers = apiPayload.getJSONArray("pendingPlayers");
-            boolean offlineCommands = apiPayload.getBoolean("offlineCommands");
+            JsonArray pendingPlayers = apiPayload.get("pendingPlayers").getAsJsonArray();
+            boolean offlineCommands = apiPayload.get("offlineCommands").getAsBoolean();
 
             // Clear current pending players (Just in case some don't have pending commands anymore)
             resetPendingPlayers();
 
-            ArrayList<Player> onlinePendingPlayers = null;
+            ArrayList<String> onlinePendingPlayers = null;
             // No point in this if there are no pending players
-            if (pendingPlayers.length() > 0) {
-                onlinePendingPlayers = new ArrayList<Player>();
+            if (pendingPlayers.size() > 0) {
+                onlinePendingPlayers = new ArrayList<String>();
 
                 // Iterate through each pending player
-                for (int i = 0; i < pendingPlayers.length(); ++i) {
-                    String playerName = pendingPlayers.getString(i).toLowerCase();
-                    Player player = getPlayer(onlinePlayers, playerName);
+                for (int i = 0; i < pendingPlayers.size(); ++i) {
+                    String playerName = pendingPlayers.get(i).getAsString().toLowerCase();
+                    String player = getPlayer(onlinePlayers, playerName);
 
                     // Check if the player is offline
                     if (player == null) {
@@ -114,7 +109,7 @@ public class PendingPlayerCheckerTask extends ApiTask implements Listener {
             // Check if we need to run the command checker
             if (offlineCommands || (onlinePendingPlayers != null && !onlinePendingPlayers.isEmpty())) {
                 // Create the array of players which will need commands to be fetched now
-                Player[] players = onlinePendingPlayers != null ? onlinePendingPlayers.toArray(new Player[onlinePendingPlayers.size()]) : new Player[] {};
+                String[] players = onlinePendingPlayers != null ? onlinePendingPlayers.toArray(new String[onlinePendingPlayers.size()]) : new String[] {};
 
                 // Call the command fetch task
                 CommandFetchTask.call(offlineCommands, players);
@@ -135,9 +130,9 @@ public class PendingPlayerCheckerTask extends ApiTask implements Listener {
         pendingPlayers.add(playerName.toLowerCase());
     }
 
-    private Player getPlayer(Player[] players, String name) {
-        for (Player player : players) {
-            if (player.getName().equalsIgnoreCase(name))
+    private String getPlayer(List<String> players, String name) {
+        for (String player : players) {
+            if (player.equalsIgnoreCase(name))
                 return player;
         }
         return null;
