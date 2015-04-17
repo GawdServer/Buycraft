@@ -9,7 +9,7 @@ import net.buycraft.Buycraft;
 import net.buycraft.api.ApiTask;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import tk.coolv1994.gawdserver.player.PlayerList;
+import tk.coolv1994.gawdapi.player.PlayerList;
 
 /**
  * Fetches an array of players which are waiting for commands to be run.

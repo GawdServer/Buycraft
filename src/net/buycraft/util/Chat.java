@@ -1,6 +1,6 @@
 package net.buycraft.util;
 
-import tk.coolv1994.gawdserver.utils.ColorCodes;
+import tk.coolv1994.gawdapi.utils.ColorCodes;
 
 public class Chat {
     private static final String header = ColorCodes.WHITE + "|----------------------"+ColorCodes.LIGHT_PURPLE+" BUYCRAFT "+ColorCodes.WHITE+"---------------------";

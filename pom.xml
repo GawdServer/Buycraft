@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>Buycraft-Plugin</groupId>
   <artifactId>Buycraft</artifactId>
-  <version>6.7</version>
+  <version>1.0</version>
   <build>
     <sourceDirectory>src</sourceDirectory>
     <finalName>${project.artifactId}_${project.version}</finalName>
@@ -16,14 +16,17 @@
       </resource>
     </resources>
   </build>
+  <repositories>
+    <repository>
+      <id>github-gawdapi</id>
+      <url>https://raw.githubusercontent.com/GawdServer/PluginAPI/mvn-repo</url>
+    </repository>
+  </repositories>
   <dependencies>
-    <!-- Get GawdServer from ProjectDir -->
     <dependency>
-        <groupId>tk.coolv1994</groupId>
-        <artifactId>gawdserver</artifactId>
-        <version>LATEST</version>
-        <scope>system</scope>
-        <systemPath>${project.basedir}/GawdServer.jar</systemPath>
+      <groupId>tk.coolv1994</groupId>
+      <artifactId>gawdapi</artifactId>
+      <version>1.0.0</version>
     </dependency>
   </dependencies>
   <organization>

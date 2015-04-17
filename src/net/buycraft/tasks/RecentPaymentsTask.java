@@ -6,9 +6,9 @@ import net.buycraft.util.Chat;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import tk.coolv1994.gawdserver.utils.ColorCodes;
+import tk.coolv1994.gawdapi.utils.ColorCodes;
 
-import static tk.coolv1994.gawdserver.utils.Chat.sendMessage;
+import static tk.coolv1994.gawdapi.utils.Chat.sendMessage;
 
 public class RecentPaymentsTask extends ApiTask {
     

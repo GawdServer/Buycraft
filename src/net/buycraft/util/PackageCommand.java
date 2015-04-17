@@ -27,29 +27,6 @@ public class PackageCommand implements Comparable<Object> {
         return requiredInventorySlots > 0;
     }
 
-    /*public int calculateRequiredInventorySlots(MC_Player player) {
-        if (requiredInventorySlots == 0) {
-            return 0;
-        }
-
-        if (player == null) {
-            return -1;
-        }
-
-        List<MC_ItemStack> inv = player.getInventory();
-        int size = inv.size();
-        int emptyCount = 0;
-        for (int i = 0; i < size; ++i) {
-            MC_ItemStack item = inv.get(i);
-            if (item == null || item.getId() == 0) {
-                if (++emptyCount == requiredInventorySlots) {
-                    return 0;
-                }
-            }
-        }
-        return requiredInventorySlots - emptyCount;
-    }*/
-
     public int compareTo(Object o) {
         // If the objects are the same return 0
         if (this == o)

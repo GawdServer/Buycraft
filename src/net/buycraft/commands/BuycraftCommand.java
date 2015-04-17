@@ -5,11 +5,11 @@ import net.buycraft.tasks.AuthenticateTask;
 import net.buycraft.tasks.RecentPaymentsTask;
 import net.buycraft.tasks.ReportTask;
 import net.buycraft.util.Chat;
-import tk.coolv1994.gawdserver.events.Command;
-import tk.coolv1994.gawdserver.perms.Permissions;
-import tk.coolv1994.gawdserver.utils.ColorCodes;
+import tk.coolv1994.gawdapi.events.Command;
+import tk.coolv1994.gawdapi.perms.Permissions;
+import tk.coolv1994.gawdapi.utils.ColorCodes;
 
-import static tk.coolv1994.gawdserver.utils.Chat.sendMessage;
+import static tk.coolv1994.gawdapi.utils.Chat.sendMessage;
 
 public class BuycraftCommand implements Command {
     private static Buycraft plugin = Buycraft.getInstance();
@@ -20,7 +20,7 @@ public class BuycraftCommand implements Command {
             if (plugin.isAuthenticated(plr)) {
                 sendMessage(plr, Chat.header());
 
-                if (Permissions.getPermManager().hasPermission(plr, "buycraft.admin")) {
+                if (Permissions.hasPermission(plr, "buycraft.admin")) {
                     sendMessage(plr, Chat.seperator() + ColorCodes.LIGHT_PURPLE + "!buycraft forcecheck:" + ColorCodes.GREEN + " Check for pending commands");
                     sendMessage(plr, Chat.seperator() + ColorCodes.LIGHT_PURPLE + "!buycraft secret <key>:" + ColorCodes.GREEN + " Set the Secret key");
                     sendMessage(plr, Chat.seperator() + ColorCodes.LIGHT_PURPLE + "!buycraft payments <ign>:" + ColorCodes.GREEN + " Get recent payments of a user");

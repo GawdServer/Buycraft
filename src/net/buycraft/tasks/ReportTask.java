@@ -15,9 +15,9 @@ import java.util.Scanner;
 import net.buycraft.Buycraft;
 import net.buycraft.api.ApiTask;
 import net.buycraft.util.Chat;
-import tk.coolv1994.gawdserver.utils.ColorCodes;
+import tk.coolv1994.gawdapi.utils.ColorCodes;
 
-import static tk.coolv1994.gawdserver.utils.Chat.sendMessage;
+import static tk.coolv1994.gawdapi.utils.Chat.sendMessage;
 
 public class ReportTask extends ApiTask {
 

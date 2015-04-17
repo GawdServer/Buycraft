@@ -10,11 +10,11 @@ import net.buycraft.Buycraft;
 import net.buycraft.api.ApiTask;
 import net.buycraft.util.Chat;
 import net.buycraft.util.PackageCommand;
-import tk.coolv1994.gawdserver.launcher.Launch;
-import tk.coolv1994.gawdserver.player.PlayerList;
-import tk.coolv1994.gawdserver.utils.ColorCodes;
+import tk.coolv1994.gawdapi.Gawd;
+import tk.coolv1994.gawdapi.player.PlayerList;
+import tk.coolv1994.gawdapi.utils.ColorCodes;
 
-import static tk.coolv1994.gawdserver.utils.Chat.sendMessage;
+import static tk.coolv1994.gawdapi.utils.Chat.sendMessage;
 
 public class CommandExecuteTask extends ApiTask {
     private static final Pattern REPLACE_NAME = Pattern.compile("[{\\(<\\[](name|player|username)[}\\)>\\]]", Pattern.CASE_INSENSITIVE);
@@ -96,34 +96,12 @@ public class CommandExecuteTask extends ApiTask {
             try {
                 PackageCommand pkgcmd = commandQueue.poll();
 
-                // Ignore the command if the player does not have enough free item slots
-                /*if (pkgcmd.requiresFreeInventorySlots()) {
-                    String player = getPlayer(PlayerList.getUsernames(), pkgcmd.username);
-                    int result = pkgcmd.calculateRequiredInventorySlots(player);
-                    if (result > 0) {
-                        // Fetch any current amounts
-                        Integer currentRequired = requiredInventorySlots.get(player);
-                        // Check an amount exists
-                        if (currentRequired == null) {
-                            currentRequired = 0;
-                        }
-
-                        // Update the hash map with the higher result
-                        if (currentRequired < result) {
-                            requiredInventorySlots.put(player, result);
-                        }
-                        
-                        continue;
-                    }
-               
-                }*/
-
                 Buycraft.getInstance().getLogger().info("Executing command '" + pkgcmd.command + "' on behalf of user '" + pkgcmd.username + "'.");
                 creditedCommands.add(pkgcmd.username);
                 long cmdStart = System.currentTimeMillis();
 
                 System.out.println("[Buycraft] Executing command: " + pkgcmd.command);
-                Launch.sendCommand(pkgcmd.command);
+                Gawd.sendCommand(pkgcmd.command);
                 // Check if the command lasted longer than our threshold
                 long cmdDiff = System.currentTimeMillis() - cmdStart;
                 if (cmdDiff >= 10) {
@@ -139,24 +117,6 @@ public class CommandExecuteTask extends ApiTask {
         }
 
         if (commandQueue.isEmpty()) {
-            // Tell users that they need more inventory space
-            /*for (Entry<String, Integer> e : requiredInventorySlots.entrySet()) {
-                String p = getPlayer(PlayerList.getOnlinePlayers(), e.getKey());
-                if (p == null) {
-                    continue;
-                }
-                Chat.sendMessage(p,
-                        Chat.header() + "\n" +
-                                Chat.seperator() + "\n" +
-                                Chat.seperator() + Chat.RED + String.format(Plugin.getInstance().getLanguage().getString("commandExecuteNotEnoughFreeInventory"), e.getValue()) + "\n" +
-                                Chat.seperator() + Chat.RED + Plugin.getInstance().getLanguage().getString("commandExecuteNotEnoughFreeInventory2") + "\n" +
-                                Chat.seperator() + "\n" +
-                                Chat.footer()
-                );
-            }
-            // Clear the map
-            requiredInventorySlots.clear();*/
-            
             for (String name : creditedCommands) {
                 String p = getPlayer(PlayerList.getOnlinePlayers(), name);
                 if (p == null) {

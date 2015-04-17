@@ -8,7 +8,6 @@ import net.buycraft.api.ApiTask;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-
 public class CommandFetchTask extends ApiTask {
 
     private static long lastExecution;

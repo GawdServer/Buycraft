@@ -11,8 +11,8 @@ import net.buycraft.util.Chat;
 import net.buycraft.util.Language;
 import net.buycraft.util.Settings;
 import com.google.gson.JsonParser;
-import tk.coolv1994.gawdserver.plugin.Plugin;
-import tk.coolv1994.gawdserver.utils.ColorCodes;
+import tk.coolv1994.gawdapi.plugin.Plugin;
+import tk.coolv1994.gawdapi.utils.ColorCodes;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -23,7 +23,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
-import static tk.coolv1994.gawdserver.utils.Chat.sendMessage;
+import static tk.coolv1994.gawdapi.utils.Chat.sendMessage;
 
 public class Buycraft implements Plugin {
     private static Logger logger = Logger.getLogger("Buycraft");
