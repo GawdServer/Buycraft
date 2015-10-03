@@ -6,15 +6,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import io.github.gawdserver.api.Server;
+import io.github.gawdserver.api.utils.Chat;
 import net.buycraft.Buycraft;
 import net.buycraft.api.ApiTask;
-import net.buycraft.util.Chat;
+import net.buycraft.util.ChatUtils;
 import net.buycraft.util.PackageCommand;
-import tk.coolv1994.gawdapi.Gawd;
-import tk.coolv1994.gawdapi.player.PlayerList;
-import tk.coolv1994.gawdapi.utils.ColorCodes;
-
-import static tk.coolv1994.gawdapi.utils.Chat.sendMessage;
+import io.github.gawdserver.api.player.PlayerList;
+import io.github.gawdserver.api.utils.ColorCodes;
 
 public class CommandExecuteTask extends ApiTask {
     private static final Pattern REPLACE_NAME = Pattern.compile("[{\\(<\\[](name|player|username)[}\\)>\\]]", Pattern.CASE_INSENSITIVE);
@@ -101,7 +100,7 @@ public class CommandExecuteTask extends ApiTask {
                 long cmdStart = System.currentTimeMillis();
 
                 System.out.println("[Buycraft] Executing command: " + pkgcmd.command);
-                Gawd.sendCommand(pkgcmd.command);
+                Server.sendCommand(pkgcmd.command);
                 // Check if the command lasted longer than our threshold
                 long cmdDiff = System.currentTimeMillis() - cmdStart;
                 if (cmdDiff >= 10) {
@@ -122,12 +121,12 @@ public class CommandExecuteTask extends ApiTask {
                 if (p == null) {
                     continue;
                 }
-                sendMessage(p,
-                        Chat.header() + "\n" +
-                                Chat.seperator() + "\n" +
-                                Chat.seperator() + ColorCodes.GREEN + Buycraft.getInstance().getLanguage().getString("commandsExecuted") + "\n" +
-                                Chat.seperator() + "\n" +
-                                Chat.footer()
+                Chat.sendMessage(p,
+                        ChatUtils.header() + "\n" +
+                                ChatUtils.seperator() + "\n" +
+                                ChatUtils.seperator() + ColorCodes.GREEN + Buycraft.getInstance().getLanguage().getString("commandsExecuted") + "\n" +
+                                ChatUtils.seperator() + "\n" +
+                                ChatUtils.footer()
                 );
             }
             // Clear the set

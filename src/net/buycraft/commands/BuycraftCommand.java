@@ -1,38 +1,37 @@
 package net.buycraft.commands;
 
+import io.github.gawdserver.api.player.Sender;
+import io.github.gawdserver.api.utils.Chat;
 import net.buycraft.Buycraft;
 import net.buycraft.tasks.AuthenticateTask;
 import net.buycraft.tasks.RecentPaymentsTask;
 import net.buycraft.tasks.ReportTask;
-import net.buycraft.util.Chat;
-import tk.coolv1994.gawdapi.events.Command;
-import tk.coolv1994.gawdapi.perms.Permissions;
-import tk.coolv1994.gawdapi.utils.ColorCodes;
-
-import static tk.coolv1994.gawdapi.utils.Chat.sendMessage;
+import net.buycraft.util.ChatUtils;
+import io.github.gawdserver.api.events.Command;
+import io.github.gawdserver.api.perms.Permissions;
+import io.github.gawdserver.api.utils.ColorCodes;
 
 public class BuycraftCommand implements Command {
     private static Buycraft plugin = Buycraft.getInstance();
 
-    @Override
     public void onCommand(String plr, String[] args) {
         if (args == null || args.length == 0) {
             if (plugin.isAuthenticated(plr)) {
-                sendMessage(plr, Chat.header());
+                Chat.sendMessage(plr, ChatUtils.header());
 
                 if (Permissions.hasPermission(plr, "buycraft.admin")) {
-                    sendMessage(plr, Chat.seperator() + ColorCodes.LIGHT_PURPLE + "!buycraft forcecheck:" + ColorCodes.GREEN + " Check for pending commands");
-                    sendMessage(plr, Chat.seperator() + ColorCodes.LIGHT_PURPLE + "!buycraft secret <key>:" + ColorCodes.GREEN + " Set the Secret key");
-                    sendMessage(plr, Chat.seperator() + ColorCodes.LIGHT_PURPLE + "!buycraft payments <ign>:" + ColorCodes.GREEN + " Get recent payments of a user");
-                    sendMessage(plr, Chat.seperator() + ColorCodes.LIGHT_PURPLE + "!buycraft report:" + ColorCodes.GREEN + " Generate an error report");
-                    sendMessage(plr, Chat.seperator());
+                    Chat.sendMessage(plr, ChatUtils.seperator() + ColorCodes.LIGHT_PURPLE + "!buycraft forcecheck:" + ColorCodes.GREEN + " Check for pending commands");
+                    Chat.sendMessage(plr, ChatUtils.seperator() + ColorCodes.LIGHT_PURPLE + "!buycraft secret <key>:" + ColorCodes.GREEN + " Set the Secret key");
+                    Chat.sendMessage(plr, ChatUtils.seperator() + ColorCodes.LIGHT_PURPLE + "!buycraft payments <ign>:" + ColorCodes.GREEN + " Get recent payments of a user");
+                    Chat.sendMessage(plr, ChatUtils.seperator() + ColorCodes.LIGHT_PURPLE + "!buycraft report:" + ColorCodes.GREEN + " Generate an error report");
+                    Chat.sendMessage(plr, ChatUtils.seperator());
                 }
 
-                sendMessage(plr, Chat.seperator() + ColorCodes.LIGHT_PURPLE + "Server ID: " + ColorCodes.GREEN + String.valueOf(plugin.getServerID()));
-                sendMessage(plr, Chat.seperator() + ColorCodes.LIGHT_PURPLE + "Server URL: " + ColorCodes.GREEN + String.valueOf(plugin.getServerStore()));
-                sendMessage(plr, Chat.seperator() + ColorCodes.LIGHT_PURPLE + "Version: " + ColorCodes.GREEN + String.valueOf(plugin.getVersion()) + " CoolV1994's Port.");
-                sendMessage(plr, Chat.seperator() + ColorCodes.LIGHT_PURPLE + "Website: " + ColorCodes.GREEN + "https://github.com/CoolV1994/GawdBot-Plugins/tree/Buycraft");
-                sendMessage(plr, Chat.footer());
+                Chat.sendMessage(plr, ChatUtils.seperator() + ColorCodes.LIGHT_PURPLE + "Server ID: " + ColorCodes.GREEN + String.valueOf(plugin.getServerID()));
+                Chat.sendMessage(plr, ChatUtils.seperator() + ColorCodes.LIGHT_PURPLE + "Server URL: " + ColorCodes.GREEN + String.valueOf(plugin.getServerStore()));
+                Chat.sendMessage(plr, ChatUtils.seperator() + ColorCodes.LIGHT_PURPLE + "Version: " + ColorCodes.GREEN + String.valueOf(plugin.getVersion()) + " CoolV1994's Port.");
+                Chat.sendMessage(plr, ChatUtils.seperator() + ColorCodes.LIGHT_PURPLE + "Website: " + ColorCodes.GREEN + "https://github.com/GawdServer/Buycraft");
+                Chat.sendMessage(plr, ChatUtils.footer());
             }
             return;
         }
@@ -52,11 +51,11 @@ public class BuycraftCommand implements Command {
         if (args[0].equalsIgnoreCase("report")) {
             // Call the report task, if it fails we don't send the following messages to the player
             if (ReportTask.call(plr)) {
-                sendMessage(plr, Chat.header());
-                sendMessage(plr, Chat.seperator());
-                sendMessage(plr, Chat.seperator() + ColorCodes.GREEN + "Beginning generation of report");
-                sendMessage(plr, Chat.seperator());
-                sendMessage(plr, Chat.footer());
+                Chat.sendMessage(plr, ChatUtils.header());
+                Chat.sendMessage(plr, ChatUtils.seperator());
+                Chat.sendMessage(plr, ChatUtils.seperator() + ColorCodes.GREEN + "Beginning generation of report");
+                Chat.sendMessage(plr, ChatUtils.seperator());
+                Chat.sendMessage(plr, ChatUtils.footer());
             }
             return;
         }
@@ -66,11 +65,11 @@ public class BuycraftCommand implements Command {
                 if (args.length == 2) {
                     String secretKey = args[1];
 
-                    sendMessage(plr, Chat.header());
-                    sendMessage(plr, Chat.seperator());
-                    sendMessage(plr, Chat.seperator() + ColorCodes.GREEN + "Server authenticated. Type !buycraft for confirmation.");
-                    sendMessage(plr, Chat.seperator());
-                    sendMessage(plr, Chat.footer());
+                    Chat.sendMessage(plr, ChatUtils.header());
+                    Chat.sendMessage(plr, ChatUtils.seperator());
+                    Chat.sendMessage(plr, ChatUtils.seperator() + ColorCodes.GREEN + "Server authenticated. Type !buycraft for confirmation.");
+                    Chat.sendMessage(plr, ChatUtils.seperator());
+                    Chat.sendMessage(plr, ChatUtils.footer());
 
                     plugin.getSettings().setString("secret", secretKey);
                     plugin.getApi().setApiKey(secretKey);
@@ -79,20 +78,20 @@ public class BuycraftCommand implements Command {
 
                     return;
                 } else {
-                    sendMessage(plr, Chat.header());
-                    sendMessage(plr, Chat.seperator());
-                    sendMessage(plr, Chat.seperator() + ColorCodes.RED + "Please enter a valid secret key.");
-                    sendMessage(plr, Chat.seperator());
-                    sendMessage(plr, Chat.footer());
+                    Chat.sendMessage(plr, ChatUtils.header());
+                    Chat.sendMessage(plr, ChatUtils.seperator());
+                    Chat.sendMessage(plr, ChatUtils.seperator() + ColorCodes.RED + "Please enter a valid secret key.");
+                    Chat.sendMessage(plr, ChatUtils.seperator());
+                    Chat.sendMessage(plr, ChatUtils.footer());
 
                     return;
                 }
             } else {
-                sendMessage(plr, Chat.header());
-                sendMessage(plr, Chat.seperator());
-                sendMessage(plr, Chat.seperator() + ColorCodes.RED + "Please change the key in settings.conf.");
-                sendMessage(plr, Chat.seperator());
-                sendMessage(plr, Chat.footer());
+                Chat.sendMessage(plr, ChatUtils.header());
+                Chat.sendMessage(plr, ChatUtils.seperator());
+                Chat.sendMessage(plr, ChatUtils.seperator() + ColorCodes.RED + "Please change the key in settings.conf.");
+                Chat.sendMessage(plr, ChatUtils.seperator());
+                Chat.sendMessage(plr, ChatUtils.footer());
 
                 return;
             }
@@ -102,14 +101,22 @@ public class BuycraftCommand implements Command {
             if (args[0].equalsIgnoreCase("forcecheck")) {
                 plugin.getPendingPlayerCheckerTask().call(true);
 
-                sendMessage(plr, Chat.header());
-                sendMessage(plr, Chat.seperator());
-                sendMessage(plr, Chat.seperator() + ColorCodes.GREEN + "Force check successfully executed.");
-                sendMessage(plr, Chat.seperator());
-                sendMessage(plr, Chat.footer());
+                Chat.sendMessage(plr, ChatUtils.header());
+                Chat.sendMessage(plr, ChatUtils.seperator());
+                Chat.sendMessage(plr, ChatUtils.seperator() + ColorCodes.GREEN + "Force check successfully executed.");
+                Chat.sendMessage(plr, ChatUtils.seperator());
+                Chat.sendMessage(plr, ChatUtils.footer());
 
                 return;
             }
         }
+    }
+
+    public void playerCommand(String player, String[] args) {
+        onCommand(player, args);
+    }
+
+    public void serverCommand(Sender sender, String[] args) {
+        onCommand(Sender.CONSOLE.name(), args);
     }
 }

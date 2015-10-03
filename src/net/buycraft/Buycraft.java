@@ -1,5 +1,6 @@
 package net.buycraft;
 
+import io.github.gawdserver.api.utils.Chat;
 import net.buycraft.api.Api;
 import net.buycraft.api.ApiTask;
 import net.buycraft.tasks.AuthenticateTask;
@@ -7,12 +8,12 @@ import net.buycraft.tasks.CommandDeleteTask;
 import net.buycraft.tasks.CommandExecuteTask;
 import net.buycraft.tasks.PendingPlayerCheckerTask;
 import net.buycraft.tasks.ReportTask;
-import net.buycraft.util.Chat;
+import net.buycraft.util.ChatUtils;
 import net.buycraft.util.Language;
 import net.buycraft.util.Settings;
 import com.google.gson.JsonParser;
-import tk.coolv1994.gawdapi.plugin.Plugin;
-import tk.coolv1994.gawdapi.utils.ColorCodes;
+import io.github.gawdserver.api.plugin.Plugin;
+import io.github.gawdserver.api.utils.ColorCodes;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -22,8 +23,6 @@ import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
-
-import static tk.coolv1994.gawdapi.utils.Chat.sendMessage;
 
 public class Buycraft implements Plugin {
     private static Logger logger = Logger.getLogger("Buycraft");
@@ -146,28 +145,28 @@ public class Buycraft implements Plugin {
     public Boolean isAuthenticated(String plr) {
         if (!authenticated) {
             if (plr != null) {
-                sendMessage(plr, Chat.header());
-                sendMessage(plr, Chat.seperator());
-                sendMessage(plr, Chat.seperator() + ColorCodes.RED + "Buycraft has failed to startup.");
-                sendMessage(plr, Chat.seperator());
+                Chat.sendMessage(plr, ChatUtils.header());
+                Chat.sendMessage(plr, ChatUtils.seperator());
+                Chat.sendMessage(plr, ChatUtils.seperator() + ColorCodes.RED + "Buycraft has failed to startup.");
+                Chat.sendMessage(plr, ChatUtils.seperator());
                 if(authenticatedCode == 101)  {
-                    sendMessage(plr, Chat.seperator() + ColorCodes.RED + "This is because of an invalid secret key,");
-                    sendMessage(plr, Chat.seperator() + ColorCodes.RED + "please enter the Secret key into the settings.conf");
-                    sendMessage(plr, Chat.seperator() + ColorCodes.RED + "file, and reload your server.");
-                    sendMessage(plr, Chat.seperator());
-                    sendMessage(plr, Chat.seperator() + ColorCodes.RED + "You can find your secret key from the control panel.");
-                    sendMessage(plr, Chat.seperator());
-                    sendMessage(plr, Chat.seperator() + ColorCodes.RED + "If it did not resolve the issue, restart your server");
-                    sendMessage(plr, Chat.seperator() + ColorCodes.RED + "a couple of times.");
-                    sendMessage(plr, Chat.seperator());
+                    Chat.sendMessage(plr, ChatUtils.seperator() + ColorCodes.RED + "This is because of an invalid secret key,");
+                    Chat.sendMessage(plr, ChatUtils.seperator() + ColorCodes.RED + "please enter the Secret key into the settings.conf");
+                    Chat.sendMessage(plr, ChatUtils.seperator() + ColorCodes.RED + "file, and reload your server.");
+                    Chat.sendMessage(plr, ChatUtils.seperator());
+                    Chat.sendMessage(plr, ChatUtils.seperator() + ColorCodes.RED + "You can find your secret key from the control panel.");
+                    Chat.sendMessage(plr, ChatUtils.seperator());
+                    Chat.sendMessage(plr, ChatUtils.seperator() + ColorCodes.RED + "If it did not resolve the issue, restart your server");
+                    Chat.sendMessage(plr, ChatUtils.seperator() + ColorCodes.RED + "a couple of times.");
+                    Chat.sendMessage(plr, ChatUtils.seperator());
                 } else {
-                    sendMessage(plr, Chat.seperator());
-                    sendMessage(plr, Chat.seperator() + ColorCodes.RED + "Please execute the '!buycraft report' command and");
-                    sendMessage(plr, Chat.seperator() + ColorCodes.RED + "then send the generated report.txt file to");
-                    sendMessage(plr, Chat.seperator() + ColorCodes.RED + "support@buycraft.net. We will be happy to help.");
-                    sendMessage(plr, Chat.seperator());
+                    Chat.sendMessage(plr, ChatUtils.seperator());
+                    Chat.sendMessage(plr, ChatUtils.seperator() + ColorCodes.RED + "Please execute the '!buycraft report' command and");
+                    Chat.sendMessage(plr, ChatUtils.seperator() + ColorCodes.RED + "then send the generated report.txt file to");
+                    Chat.sendMessage(plr, ChatUtils.seperator() + ColorCodes.RED + "support@buycraft.net. We will be happy to help.");
+                    Chat.sendMessage(plr, ChatUtils.seperator());
                 }
-                sendMessage(plr, Chat.footer());
+                Chat.sendMessage(plr, ChatUtils.footer());
             }
 
             return false;

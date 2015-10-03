@@ -1,14 +1,13 @@
 package net.buycraft.tasks;
 
+import io.github.gawdserver.api.utils.Chat;
 import net.buycraft.Buycraft;
 import net.buycraft.api.ApiTask;
-import net.buycraft.util.Chat;
+import net.buycraft.util.ChatUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import tk.coolv1994.gawdapi.utils.ColorCodes;
-
-import static tk.coolv1994.gawdapi.utils.Chat.sendMessage;
+import io.github.gawdserver.api.utils.ColorCodes;
 
 public class RecentPaymentsTask extends ApiTask {
     
@@ -34,37 +33,37 @@ public class RecentPaymentsTask extends ApiTask {
                 JsonArray entries = apiResponse.get("payload").getAsJsonArray();
                 
                 if(entries != null && entries.size() > 0) {
-                    sendMessage(receiver, Chat.header());
-                    sendMessage(receiver, Chat.seperator());
+                    Chat.sendMessage(receiver, ChatUtils.header());
+                    Chat.sendMessage(receiver, ChatUtils.seperator());
                     
                     if(playerLookup.isEmpty())
                     {
-                        sendMessage(receiver, Chat.seperator() + "Displaying recent payments over all users: ");
+                        Chat.sendMessage(receiver, ChatUtils.seperator() + "Displaying recent payments over all users: ");
                     }
                     else
                     {
-                        sendMessage(receiver, Chat.seperator() + "Displaying recent payments from the user " + playerLookup + ":");
+                        Chat.sendMessage(receiver, ChatUtils.seperator() + "Displaying recent payments from the user " + playerLookup + ":");
                     }
 
-                    sendMessage(receiver, Chat.seperator());
+                    Chat.sendMessage(receiver, ChatUtils.seperator());
                     
                     for(int i=0; i<entries.size(); i++) {
 
                         JsonObject entry = entries.get(i).getAsJsonObject();
 
-                        sendMessage(receiver, Chat.seperator() + "[" + entry.get("humanTime").getAsString() + "] " + ColorCodes.LIGHT_PURPLE + entry.get("ign").getAsString() + ColorCodes.GREEN + " (" + entry.get("price").getAsString() + " " + entry.get("currency").getAsString() + ")");
+                        Chat.sendMessage(receiver, ChatUtils.seperator() + "[" + entry.get("humanTime").getAsString() + "] " + ColorCodes.LIGHT_PURPLE + entry.get("ign").getAsString() + ColorCodes.GREEN + " (" + entry.get("price").getAsString() + " " + entry.get("currency").getAsString() + ")");
                     }
 
-                    sendMessage(receiver, Chat.seperator());
-                    sendMessage(receiver, Chat.footer());
+                    Chat.sendMessage(receiver, ChatUtils.seperator());
+                    Chat.sendMessage(receiver, ChatUtils.footer());
                 }
                 else
                 {
-                    sendMessage(receiver, Chat.header());
-                    sendMessage(receiver, Chat.seperator());
-                    sendMessage(receiver, Chat.seperator() + ColorCodes.RED + "No recent payments to display.");
-                    sendMessage(receiver, Chat.seperator());
-                    sendMessage(receiver, Chat.footer());
+                    Chat.sendMessage(receiver, ChatUtils.header());
+                    Chat.sendMessage(receiver, ChatUtils.seperator());
+                    Chat.sendMessage(receiver, ChatUtils.seperator() + ColorCodes.RED + "No recent payments to display.");
+                    Chat.sendMessage(receiver, ChatUtils.seperator());
+                    Chat.sendMessage(receiver, ChatUtils.footer());
                 }
             } 
         } catch (JsonParseException e) {

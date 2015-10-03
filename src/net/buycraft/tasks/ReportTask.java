@@ -12,12 +12,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
 
+import io.github.gawdserver.api.utils.Chat;
 import net.buycraft.Buycraft;
 import net.buycraft.api.ApiTask;
-import net.buycraft.util.Chat;
-import tk.coolv1994.gawdapi.utils.ColorCodes;
-
-import static tk.coolv1994.gawdapi.utils.Chat.sendMessage;
+import net.buycraft.util.ChatUtils;
+import io.github.gawdserver.api.utils.ColorCodes;
 
 public class ReportTask extends ApiTask {
 
@@ -38,11 +37,11 @@ public class ReportTask extends ApiTask {
     public static boolean call(String sender) {
         if (running) {
             if (sender instanceof String) {
-                sendMessage(sender, Chat.header());
-                sendMessage(sender, Chat.seperator());
-                sendMessage(sender, Chat.seperator() + ColorCodes.RED + "A report is already being generated. Please wait.");
-                sendMessage(sender, Chat.seperator());
-                sendMessage(sender, Chat.footer());
+                Chat.sendMessage(sender, ChatUtils.header());
+                Chat.sendMessage(sender, ChatUtils.seperator());
+                Chat.sendMessage(sender, ChatUtils.seperator() + ColorCodes.RED + "A report is already being generated. Please wait.");
+                Chat.sendMessage(sender, ChatUtils.seperator());
+                Chat.sendMessage(sender, ChatUtils.footer());
             } else {
                 Buycraft.getInstance().getLogger().warning("A report is already being generated. Please wait.");
             }
@@ -115,12 +114,12 @@ public class ReportTask extends ApiTask {
                     ));
         } catch (Throwable e) {
             if (sender instanceof String) {
-                sendMessage(sender, Chat.header());
-                sendMessage(sender, Chat.seperator());
-                sendMessage(sender, Chat.seperator() + ColorCodes.RED + "Error occured when generating the report");
-                sendMessage(sender, Chat.seperator() + ColorCodes.RED + "See console for more information");
-                sendMessage(sender, Chat.seperator());
-                sendMessage(sender, Chat.footer());
+                Chat.sendMessage(sender, ChatUtils.header());
+                Chat.sendMessage(sender, ChatUtils.seperator());
+                Chat.sendMessage(sender, ChatUtils.seperator() + ColorCodes.RED + "Error occured when generating the report");
+                Chat.sendMessage(sender, ChatUtils.seperator() + ColorCodes.RED + "See console for more information");
+                Chat.sendMessage(sender, ChatUtils.seperator());
+                Chat.sendMessage(sender, ChatUtils.footer());
             }
 
             Buycraft.getInstance().getLogger().warning("Error occured when generating the report");
@@ -182,11 +181,11 @@ public class ReportTask extends ApiTask {
             }
 
             if (sender instanceof String) {
-                sendMessage(sender, Chat.header());
-                sendMessage(sender, Chat.seperator());
-                sendMessage(sender, Chat.seperator() + ColorCodes.GREEN + "Report written to " + report.getPath());
-                sendMessage(sender, Chat.seperator());
-                sendMessage(sender, Chat.footer());
+                Chat.sendMessage(sender, ChatUtils.header());
+                Chat.sendMessage(sender, ChatUtils.seperator());
+                Chat.sendMessage(sender, ChatUtils.seperator() + ColorCodes.GREEN + "Report written to " + report.getPath());
+                Chat.sendMessage(sender, ChatUtils.seperator());
+                Chat.sendMessage(sender, ChatUtils.footer());
             }
             Buycraft.getInstance().getLogger().info("Report written to " + report.getPath());
     }

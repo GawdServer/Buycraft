@@ -5,7 +5,7 @@ import net.buycraft.tasks.ReportTask;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import tk.coolv1994.gawdapi.player.PlayerList;
+import io.github.gawdserver.api.player.PlayerList;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
